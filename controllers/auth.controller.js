@@ -11,8 +11,8 @@ export const signUp = async (req, res, next) => {
     try {
         // Logic to create a new user
         const {name, email, password} = req.body;
-        
-        // check if user already existed 
+
+        // check if user already existed
         const existingUser = await User.findOne({email});
 
         if(existingUser) {
@@ -21,8 +21,7 @@ export const signUp = async (req, res, next) => {
             throw error;
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUsers = await User.create([{
             name,
@@ -31,7 +30,7 @@ export const signUp = async (req, res, next) => {
         }], {session});
 
         const token = jwt.sign({userId: newUsers[0]._id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN})
-        
+
         await session.commitTransaction();
         session.endSession();
 
@@ -41,7 +40,7 @@ export const signUp = async (req, res, next) => {
             data: {
                 token,
                 user: newUsers[0]
-            } 
+            }
 
         })
     } catch (error) {
@@ -49,7 +48,7 @@ export const signUp = async (req, res, next) => {
         session.endSession()
         next(error)
     }
-    
+
 }
 
 export const signIn = async (req, res, next) => {
@@ -79,7 +78,7 @@ export const signIn = async (req, res, next) => {
             success: true,
             message: "User signed in successfully!",
             data: {
-                token, 
+                token,
                 user
             }
         })
@@ -88,7 +87,7 @@ export const signIn = async (req, res, next) => {
     }
 }
 
-export const signOut = async (req, res, next) => {
-    // implement sign out logic
-    
-}
+// export const signOut = async (req, res, next) => {
+//     // implement sign out logic
+
+// }
